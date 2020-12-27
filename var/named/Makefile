@@ -1,4 +1,4 @@
-include zonedata/config.mk
+include /var/named/zonedata/config.mk
 
 RNDC = /usr/sbin/rndc
 GIT = /usr/bin/git

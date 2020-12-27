@@ -1,0 +1,46 @@
+### Makefile template for master dir
+###
+### To create new master server
+###
+### mkdir ns1.example.com
+### cp mastertmpl.make ns1.example.com/Makefile
+###
+
+TARGETS = master.conf slave.conf my-role.conf
+
+.PHONY: all clean $(TARGETS)
+all: $(TARGETS)
+
+clean:
+	rm -f $(TARGETS)
+
+master.conf: *.zone
+	cat /dev/null >$@; \
+	ns=`realpath . | sed -e 's!^.*/!!'`; \
+	for zonefile in *.zone; do \
+	  zone=`basename $${zonefile} .zone`; \
+	  echo "zone \"$${zone}\" IN {" >>$@; \
+	  echo "  type master;" >>$@; \
+	  echo "  file \"zonedata/$${ns}/$${zonefile}\";" >>$@; \
+	  echo "};" >>$@; \
+	done
+
+slave.conf: *.zone
+	cat /dev/null >$@; \
+	ns=`realpath . | sed -e 's!^.*/!!'`; \
+	masters=`echo $${ns} | sed -e 's/\./_/g'`; \
+	for zonefile in *.zone; do \
+	  zone=`basename $${zonefile} .zone`; \
+	  echo "zone \"$${zone}\" IN {" >>$@; \
+	  echo "  type slave;" >>$@; \
+	  echo "  file \"slaves/$${zonefile}\";" >>$@; \
+	  echo "  masters { $${masters}; };" >>$@; \
+	  echo "};" >>$@; \
+	done
+
+my-role.conf: master.conf slave.conf
+	if [ "$(NAMED_ROLE)" != "" -a "$(NAMED_ROLE)" = "$(NAMED_SERVER)" ]; then \
+	  ln -sf master.conf $@; \
+	else \
+	  ln -sf slave.conf $@; \
+	fi

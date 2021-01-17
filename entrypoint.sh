@@ -51,4 +51,4 @@ make -C /var/named NAMED_ROLE=$NAMED_ROLE all
   sleep 60; \
   make -C /var/named NAMED_ROLE=$NAMED_ROLE reload; \
 done) &
-exec /usr/sbin/named -u named -c /etc/named.conf -g
+/usr/sbin/named -u named -c /etc/named.conf -g

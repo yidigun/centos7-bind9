@@ -14,6 +14,12 @@ if [ ! -f /etc/rndc.key ]; then
 
 fi
 
+GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+if [ -n "$GIT_SSH_KEY" -a -f "$GIT_SSH_KEY" ]; then
+  GIT_SSH_COMMAND="$GIT_SSH_COMMAND -i $GIT_SSH_KEY"
+fi
+export GIT_SSH_COMMAND
+
 if [ ! -d "/var/named/zonedata" ]; then
 
   echo "Initializing Server Configurations..."
